@@ -136,6 +136,20 @@ func Logout(c *gin.Context) {
 	helpers.SuccessResponse(c, http.StatusOK, "Logout successful", nil)
 }
 
+func GetProfile(c *gin.Context) {
+	authID := helpers.GetAuthUser(c).ID
+
+	var user models.User
+	result := initializers.DB.First(&user, authID)
+
+	if err := result.Error; err != nil {
+		format_errors.RecordNotFound(c, err)
+		return
+	}
+
+	helpers.SuccessResponse(c, http.StatusOK, "Success get profile", user)
+}
+
 // GetUsers function is used to get users list
 func GetUsers(c *gin.Context) {
 	// Get all the users
@@ -154,9 +168,7 @@ func GetUsers(c *gin.Context) {
 	}
 
 	// Return the users
-	c.JSON(http.StatusOK, gin.H{
-		"result": result,
-	})
+	helpers.SuccessResponse(c, http.StatusOK, "Success get users", result)
 }
 
 // DetailUser function is used to find a user by id

@@ -2,3 +2,5 @@
 go.sum
 .env
 golang-gin-jwt-auth-crud
+.vscode
+tmp
