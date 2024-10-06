@@ -1,8 +1,8 @@
 package tests
 
 import (
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/db/initializers"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/models"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/db/initializers"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/models"
 	"github.com/joho/godotenv"
 	"log"
 )

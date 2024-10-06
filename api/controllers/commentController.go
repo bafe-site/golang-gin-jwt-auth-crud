@@ -1,14 +1,15 @@
 package controllers
 
 import (
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/db/initializers"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/format-errors"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/helpers"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/models"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/validations"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"net/http"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/db/initializers"
+	format_errors "github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/format-errors"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/helpers"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/models"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/validations"
 )
 
 // CommentOnPost comments on a post

@@ -2,7 +2,7 @@ package validations
 
 import (
 	"fmt"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/db/initializers"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/db/initializers"
 	"github.com/go-playground/validator/v10"
 )
 

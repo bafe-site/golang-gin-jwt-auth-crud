@@ -1,9 +1,9 @@
 package router
 
 import (
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/api/controllers"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/api/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/api/controllers"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/api/middleware"
 )
 
 func GetRoute(r *gin.Engine) {
@@ -16,7 +16,7 @@ func GetRoute(r *gin.Engine) {
 	userRouter := r.Group("/api/users")
 	{
 		userRouter.GET("/", controllers.GetUsers)
-		userRouter.GET("/:id/edit", controllers.EditUser)
+		userRouter.GET("/:id", controllers.DetailUser)
 		userRouter.PUT("/:id/update", controllers.UpdateUser)
 		userRouter.DELETE("/:id/delete", controllers.DeleteUser)
 		userRouter.GET("/all-trash", controllers.GetTrashedUsers)
@@ -26,7 +26,7 @@ func GetRoute(r *gin.Engine) {
 	// Category routes
 	catRouter := r.Group("/api/categories")
 	{
-		//catRouter.Use(middleware.RequireAuth)
+		// catRouter.Use(middleware.RequireAuth)
 
 		catRouter.GET("/", controllers.GetCategories)
 		catRouter.POST("/create", controllers.CreateCategory)

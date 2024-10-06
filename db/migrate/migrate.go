@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/config"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/db/initializers"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/models"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/config"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/db/initializers"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/models"
 	"log"
 )
 

@@ -1,19 +1,21 @@
 package controllers
 
 import (
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/db/initializers"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/format-errors"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/models"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/pagination"
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/internal/validations"
-	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
-	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/db/initializers"
+	format_errors "github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/format-errors"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/helpers"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/models"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/pagination"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/internal/validations"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Signup function is used to create a user or signup a user
@@ -27,45 +29,29 @@ func Signup(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&userInput); err != nil {
 		if errs, ok := err.(validator.ValidationErrors); ok {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{
-				"validations": validations.FormatValidationErrors(errs),
-			})
+			helpers.ErrorValidation(c, http.StatusUnprocessableEntity, validations.FormatValidationErrors(errs))
 			return
 		}
 
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
-		})
+		helpers.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	// Email unique validation
 	if validations.IsUniqueValue("users", "email", userInput.Email) {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{
-			"validations": map[string]interface{}{
-				"Email": "The email is already exist!",
-			},
-		})
+
+		errValidation := map[string]interface{}{
+			"Email": "The email is already exist!",
+		}
+		helpers.ErrorValidation(c, http.StatusUnprocessableEntity, errValidation)
 		return
 	}
-	//if err := initializers.DB.Where("email = ?", userInput.Email).First(&models.User{}).Error; err == nil {
-	//	c.JSON(http.StatusConflict, gin.H{
-	//		"validations": map[string]interface{}{
-	//			"Email": "The email is already exist!",
-	//		},
-	//	})
-	//
-	//	return
-	//}
 
 	// Hash the password
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(userInput.Password), 10)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to hash password",
-		})
-
+		helpers.ErrorResponse(c, http.StatusInternalServerError, "Failed to hash password")
 		return
 	}
 
@@ -83,12 +69,7 @@ func Signup(c *gin.Context) {
 		return
 	}
 
-	// Return the user
-	//user.Password = ""
-
-	c.JSON(http.StatusOK, gin.H{
-		"user": user,
-	})
+	helpers.SuccessResponse(c, http.StatusOK, "Success registered user", user)
 }
 
 // Login function is used to log in a user
@@ -98,12 +79,13 @@ func Login(c *gin.Context) {
 		Email    string `json:"email" binding:"required,email"`
 		Password string `json:"password" binding:"required"`
 	}
+	if err := c.ShouldBindJSON(&userInput); err != nil {
+		if errs, ok := err.(validator.ValidationErrors); ok {
+			helpers.ErrorValidation(c, http.StatusUnprocessableEntity, validations.FormatValidationErrors(errs))
+			return
+		}
 
-	if c.ShouldBindJSON(&userInput) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body",
-		})
-
+		helpers.ErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -112,20 +94,14 @@ func Login(c *gin.Context) {
 	initializers.DB.First(&user, "email = ?", userInput.Email)
 
 	if user.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid email or password",
-		})
-
+		helpers.ErrorResponse(c, http.StatusBadRequest, "Invalid email or password")
 		return
 	}
 
 	// Compare the password with user hashed password
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(userInput.Password))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid email or password",
-		})
-
+		helpers.ErrorResponse(c, http.StatusBadRequest, "Invalid email or password")
 		return
 	}
 
@@ -139,16 +115,17 @@ func Login(c *gin.Context) {
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to create token",
-		})
+		helpers.ErrorResponse(c, http.StatusBadRequest, "Failed to create token")
 		return
 	}
 
 	// Set expiry time and send the token back
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
-	c.JSON(http.StatusOK, gin.H{})
+	helpers.SuccessResponse(c, http.StatusOK, "Login successful", map[string]interface{}{
+		"token": tokenString,
+		"user":  user,
+	})
 }
 
 // Logout function is used to log out a user
@@ -156,9 +133,7 @@ func Logout(c *gin.Context) {
 	// Clear the cookie
 	c.SetCookie("Authorization", "", 0, "", "", false, true)
 
-	c.JSON(http.StatusOK, gin.H{
-		"successMessage": "Logout successful",
-	})
+	helpers.SuccessResponse(c, http.StatusOK, "Logout successful", nil)
 }
 
 // GetUsers function is used to get users list
@@ -184,8 +159,8 @@ func GetUsers(c *gin.Context) {
 	})
 }
 
-// EditUser function is used to find a user by id
-func EditUser(c *gin.Context) {
+// DetailUser function is used to find a user by id
+func DetailUser(c *gin.Context) {
 	// Get the id from url
 	id := c.Param("id")
 
@@ -198,10 +173,7 @@ func EditUser(c *gin.Context) {
 		return
 	}
 
-	// Return the user
-	c.JSON(http.StatusOK, gin.H{
-		"result": user,
-	})
+	helpers.SuccessResponse(c, http.StatusOK, "Success get detail user", user)
 }
 
 // UpdateUser function is used to update a user

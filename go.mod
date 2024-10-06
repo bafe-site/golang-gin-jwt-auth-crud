@@ -1,4 +1,4 @@
-module github.com/RakibSiddiquee/golang-gin-jwt-auth-crud
+module github.com/nuwasdzarrin/golang-gin-jwt-auth-crud
 
 go 1.20
 

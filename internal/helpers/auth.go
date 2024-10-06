@@ -1,9 +1,10 @@
 package helpers
 
 import (
-	"github.com/RakibSiddiquee/golang-gin-jwt-auth-crud/api/middleware"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/nuwasdzarrin/golang-gin-jwt-auth-crud/api/middleware"
 )
 
 // GetAuthUser returns the authenticated user details from the Gin context
